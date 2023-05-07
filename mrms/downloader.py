@@ -55,7 +55,7 @@ class MRMSDownloader:
             if _status == 404:
                 # Possibly a time nuance that the file is not online yet
                 # Just wait for a short time and retry
-                return 60
+                return 10
 
     def _ensure_save_dir(self, dt: datetime) -> os.PathLike:
         save_dir = self.base_dir / str(dt.year) / f"{dt.month:02d}{dt.day:02d}"
