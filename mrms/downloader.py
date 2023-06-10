@@ -77,6 +77,7 @@ class MrmsDownloader(AbstractDownloader):
         data = pygrib.open(str(grib2_path))
         for var in data:
             precip = var['values']
+        data.close()
 
         precip = (precip+3)*10
         precip = precip.astype('int16')
