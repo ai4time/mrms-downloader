@@ -28,34 +28,23 @@ class MrmsDownloader(AbstractDownloader):
         self.base_dir = Path(base_dir)
 
     def download1(self, dt: datetime) -> bool:
-        urls = [
-            # self.url_noaa(dt), # real time only (within ~24h)
-            self.url_iastate(dt), # both real time and historical data
-        ]
-
+        url = self.url(dt)
         save_path = self.save_path(dt)
+        try:
+            self._download(url, save_path)
+            return True
+        except HTTPError as e:
+            _status = e.response.status_code
+            logger.error(
+                f"Failed to download {url}: "
+                f"[{_status}] {e.response.reason}"
+            )
+            return False
 
-        for url in urls:
-            try:
-                self._download(url, save_path)
-                return True
-            except HTTPError as e:
-                _status = e.response.status_code
-                logger.error(
-                    f"Failed to download {url}: "
-                    f"[{_status}] {e.response.reason}"
-                )
-        return False
-
-    def url_noaa(self, dt: datetime) -> str:
+    def url(self, dt: datetime) -> str:
         dt_str = datetime.strftime(dt, "%Y%m%d-%H%M%S")
         filename = f"MRMS_PrecipRate_00.00_{dt_str}.grib2.gz"
         return f"https://mrms.ncep.noaa.gov/data/2D/PrecipRate/{filename}"
-
-    def url_iastate(self, dt: datetime) -> str:
-        dt_str = datetime.strftime(dt, "%Y%m%d-%H%M%S")
-        filename = f"PrecipRate_00.00_{dt_str}.grib2.gz"
-        return f"https://mtarchive.geol.iastate.edu/{dt.year}/{dt.month:02d}/{dt.day:02d}/mrms/ncep/PrecipRate/{filename}"
 
     def save_path(self, dt: datetime) -> os.PathLike:
         dt_str = datetime.strftime(dt, "%Y%m%d-%H%M%S")
@@ -100,6 +89,13 @@ class MrmsDownloader(AbstractDownloader):
         png_save_path = grib2_path.with_suffix('.png')
         cv2.imwrite(str(png_save_path), precip)
         logger.info(f"Converted to {png_save_path}")
+
+
+class MrmsIsuDownloader(MrmsDownloader):
+    def url(self, dt: datetime) -> str:
+        dt_str = datetime.strftime(dt, "%Y%m%d-%H%M%S")
+        filename = f"PrecipRate_00.00_{dt_str}.grib2.gz"
+        return f"https://mtarchive.geol.iastate.edu/{dt.year}/{dt.month:02d}/{dt.day:02d}/mrms/ncep/PrecipRate/{filename}"
 
 
 class TjwfSimulatedDownloader(AbstractDownloader):

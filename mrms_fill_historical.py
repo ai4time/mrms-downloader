@@ -1,19 +1,22 @@
+import os
 import time
 from datetime import datetime, timedelta, timezone
 
 import anylearn
 
-from mrms import round_down, MrmsTimer, MrmsDownloader
+from mrms import round_down, MrmsTimer, MrmsIsuDownloader
 from mrms.logger import logger
 
 
-# data_workspace = anylearn.get_dataset("yhuang/MRMS").download()
-data_workspace = "./data"
+if os.environ.get('ANYLEARN_TASK_ID', None) is not None:
+    data_workspace = anylearn.get_dataset("yhuang/MRMS").download()
+else:
+    data_workspace = "./data"
 
 
 def run(start_dt: datetime, end_dt: datetime, debouncing_seconds: int=1):
     timer = MrmsTimer()
-    downloader = MrmsDownloader(base_dir=data_workspace)
+    downloader = MrmsIsuDownloader(base_dir=data_workspace)
 
     datetime_collection = []
     _from = round_down(start_dt, timer.interval) + timer.interval
