@@ -28,19 +28,22 @@ def run(start_dt: datetime, end_dt: datetime, debouncing_seconds: int=1):
 
     errors = []
     for dt in datetime_collection:
-        try:
-            if downloader.save_path(dt).exists():
-                logger.info(f"Skipping {dt}")
-                continue
-            if not downloader.download1(dt):
-                errors.append(dt)
-            time.sleep(debouncing_seconds)
-        except Exception as e:
-            logger.error(f"Failed to download {dt}: {e}")
+        if not download(downloader, dt):
             errors.append(dt)
 
     logger.error(f"/!\ Errors: {errors}")
     return errors
+
+
+def download(downloader: MrmsIsuDownloader, dt: datetime) -> bool:
+    try:
+        if downloader.save_path(dt).exists():
+            logger.info(f"Skipping {dt}")
+            return True
+        return downloader.download1(dt)
+    except Exception as e:
+        logger.error(f"Failed to download {dt}: {e}")
+        return False
 
 
 if __name__ == "__main__":
