@@ -1,3 +1,4 @@
+import argparse
 import os
 import time
 from datetime import datetime, timedelta, timezone
@@ -43,6 +44,28 @@ def run(start_dt: datetime, end_dt: datetime, debouncing_seconds: int=1):
 
 
 if __name__ == "__main__":
-    start = datetime.now(timezone.utc) - timedelta(weeks=1)
-    end = datetime.now(timezone.utc) - timedelta(days=1)
+    parser = argparse.ArgumentParser(description="MRMS downloader filling missing data")
+    parser.add_argument(
+        "--start",
+        type=str,
+        default=(datetime.now(timezone.utc) - timedelta(weeks=1)).strftime("%Y%m%d%H%M%S"),
+        help="start time in format of YYYYMMDDHHMMSS.",
+    )
+    parser.add_argument(
+        "--end",
+        type=str,
+        default=(datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d%H%M%S"),
+        help="end time in format of YYYYMMDDHHMMSS.",
+    )
+    parser.add_argument(
+        "--timezone-offset-hours",
+        type=str,
+        default="0",
+        help="timezone offset in hours, example: +8 for Asia/Shanghai. Default UTC.",
+    )
+    
+    args = parser.parse_args()
+    tz = timezone(timedelta(hours=int(args.timezone_offset_hours)))
+    start = datetime.strptime(args.start, "%Y%m%d%H%M%S").replace(tzinfo=tz)
+    end = datetime.strptime(args.end, "%Y%m%d%H%M%S").replace(tzinfo=tz)
     run(start, end)
