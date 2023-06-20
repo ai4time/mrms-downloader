@@ -2,6 +2,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 
+def round_down(now: datetime, interval: timedelta) -> datetime:
+    now_ts = int(now.timestamp())
+    interval_s = int(interval.total_seconds())
+    last_ts = now_ts - (now_ts % interval_s)
+    return datetime.fromtimestamp(last_ts, tz=now.tzinfo)
+
+
 @dataclass
 class TimerBounds:
     last: datetime
@@ -31,7 +38,7 @@ class Timer:
 
     def get_bouding_datetime(self) -> TimerBounds:
         now = self._now()
-        last = self._round_down(now)
+        last = round_down(now, self.interval)
         next = last + self.interval
         return TimerBounds(last, next)
 
@@ -43,12 +50,6 @@ class Timer:
 
     def _now(self) -> datetime:
         return datetime.now(self.tz) - self.delay
-
-    def _round_down(self, now: datetime) -> datetime:
-        now_ts = int(now.timestamp())
-        interval_s = int(self.interval.total_seconds())
-        last_ts = now_ts - (now_ts % interval_s)
-        return datetime.fromtimestamp(last_ts, tz=self.tz)
 
 
 class MrmsTimer(Timer):

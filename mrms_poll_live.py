@@ -5,8 +5,9 @@ import anylearn
 from mrms import MrmsTimer, MrmsDownloader
 
 
-data_workspace = anylearn.get_dataset("yhuang/MRMS").download()
-# data_workspace = "./data"
+# data_workspace = anylearn.get_dataset("yhuang/MRMS").download()
+data_workspace = "./data"
+
 
 def run():
     timer = MrmsTimer()
