@@ -32,6 +32,8 @@ class MrmsDownloader(AbstractDownloader):
         save_path = self.save_path(dt)
         try:
             self._download(url, save_path)
+            self._2png(save_path, 'uint16')
+            self._2png(save_path, 'int16')
             return True
         except HTTPError as e:
             _status = e.response.status_code
@@ -65,7 +67,18 @@ class MrmsDownloader(AbstractDownloader):
             f.write(res.content)
         logger.info(f"Saved to {save_path}")
 
-    def _2png(self, grib2gz_path: os.PathLike) -> None:
+    def _2png(
+        self,
+        grib2gz_path: os.PathLike,
+        data_type: str = 'uint16',
+    ) -> None:
+        ALLOWED_DATA_TYPES = ['int16', 'uint16']
+        if data_type not in ALLOWED_DATA_TYPES:
+            raise ValueError(
+                f"Expected data_type to be one of {ALLOWED_DATA_TYPES}, "
+                f"got {data_type}"
+            )
+
         import gzip
 
         import cv2
@@ -84,9 +97,9 @@ class MrmsDownloader(AbstractDownloader):
         data.close()
 
         precip = (precip+3)*10
-        precip = precip.astype('int16')
+        precip = precip.astype(data_type)
 
-        png_save_path = grib2_path.with_suffix('.png')
+        png_save_path = grib2_path.with_suffix(f".{data_type}.png")
         cv2.imwrite(str(png_save_path), precip)
         logger.info(f"Converted to {png_save_path}")
 
