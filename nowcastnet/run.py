@@ -1,17 +1,28 @@
+import argparse
 import os
 import shutil
-import argparse
-import cv2
-import numpy as np
+
+import anylearn
 import torch
+
+import nowcasting.evaluator as evaluator
 from nowcasting.data_provider import datasets_factory
 from nowcasting.models.model_factory import Model
-import nowcasting.evaluator as evaluator
-import time
-import sys
+
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
+
+
+if os.environ.get('ANYLEARN_TASK_ID', None) is not None:
+    pretrained_model_path = str(anylearn.get_model("chenky/mrms_nowcastnet").download())
+    dataset_path = str(anylearn.get_dataset("yhuang/MRMS").download())
+    output_path = str(anylearn.get_dataset("yhuang/MRMS-RT").download())
+else:
+    pretrained_model_path = ""
+    dataset_path = "./data"
+    output_path = "./data"
+
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='NowcastNet')
 
@@ -27,11 +38,12 @@ parser.add_argument('--img_ch', type=int, default=2)
 parser.add_argument('--case_type', type=str, default='normal')
 parser.add_argument('--model_name', type=str, default='nowcasting')
 parser.add_argument('--gen_frm_dir', type=str, default='results/nowcasting')
-parser.add_argument('--pretrained_model', type=str, default='')
+parser.add_argument('--pretrained_model', type=str, default=pretrained_model_path)
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--num_save_samples', type=int, default=10)
 parser.add_argument('--ngf', type=int, default=32)
-parser.add_argument('--dataset_path', type=str)
+parser.add_argument('--dataset_path', type=str, default=dataset_path)
+parser.add_argument('--output_path', type=str, default=dataset_path)
 
 parser.add_argument('--present_time', type=str)
 

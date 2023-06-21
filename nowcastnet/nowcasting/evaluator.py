@@ -70,7 +70,7 @@ def test_pytorch_loader(model, test_input_handle, configs, itr):
             #            labels=['gt{}'.format(i + 1) for i in range(configs.input_length)],
             #            res_path=path, vmin=vis_info['vmin'], vmax=vis_info['vmax'])
             print('range:', np.min(img_gen_plot), np.max(img_gen_plot))
-            path = check_path(root_path=configs.dataset_path + '/results', time=configs.present_time, 
+            path = check_path(root_path=configs.output_path + '/results', time=configs.present_time, 
                               model_name=configs.model_name)
             
             save_plots(img_gen_plot,
