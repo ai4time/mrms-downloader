@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -ex
+
+# This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
+
+# This script contains predictions of the USA events shown in the paper. The output folders '0' to '9' correspond to Fig. 2 in the main text, Extended Data Fig. 2-6 and Supplementary Fig.2-5 in order.
+bash mrms_case_test.sh "$@"
+
+# This script contains predictions on the USA event with large spatial range shown in the paper. The output folder '0' corresponds to Extend Data Fig. 9.
+bash mrms_large_case_test.sh "$@"

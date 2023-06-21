@@ -202,4 +202,7 @@ data/*
 quick_train.py
 anylearn-upload*
 anylearn-run*
+anylearn_upload*
+anylearn_run*
+anylearn_start*
 train_by_anylearn*
