@@ -1,11 +1,11 @@
-from mrms.downloader import (
+from ingestion.downloader import (
     AbstractDownloader,
     MrmsDownloader,
     MrmsIsuDownloader,
     TjwfSimulatedDownloader,
 )
 
-from mrms.timer import (
+from ingestion.timer import (
     round_down,
     Timer,
     TimerBounds,

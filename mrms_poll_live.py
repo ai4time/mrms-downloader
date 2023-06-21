@@ -3,7 +3,7 @@ import time
 
 import anylearn
 
-from mrms import MrmsTimer, MrmsDownloader
+from ingestion import MrmsTimer, MrmsDownloader
 
 
 if os.environ.get('ANYLEARN_TASK_ID', None) is not None:

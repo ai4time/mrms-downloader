@@ -8,7 +8,7 @@ from pathlib import Path
 import requests
 from requests.exceptions import HTTPError
 
-from mrms.logger import logger
+from ingestion.logger import logger
 
 
 class AbstractDownloader(abc.ABC):
