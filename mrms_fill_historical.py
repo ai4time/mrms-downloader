@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 from datetime import datetime, timedelta, timezone
 
 import anylearn
@@ -14,7 +15,12 @@ else:
     data_workspace = "./data"
 
 
-def run(start_dt: datetime, end_dt: datetime, debouncing_seconds: int=1):
+def run(
+    start_dt: datetime,
+    end_dt: datetime,
+    force_overwrite: bool = False,
+    debouncing_seconds: int = 1,
+):
     timer = MrmsTimer()
     downloader = MrmsIsuDownloader(base_dir=data_workspace)
 
@@ -27,16 +33,21 @@ def run(start_dt: datetime, end_dt: datetime, debouncing_seconds: int=1):
 
     errors = []
     for dt in datetime_collection:
-        if not download(downloader, dt):
+        if not download(downloader, dt, force_overwrite):
             errors.append(dt)
+        time.sleep(debouncing_seconds)
 
     logger.error(f"/!\ Errors: {errors}")
     return errors
 
 
-def download(downloader: MrmsIsuDownloader, dt: datetime) -> bool:
+def download(
+    downloader: MrmsIsuDownloader,
+    dt: datetime,
+    force_overwrite: bool = False,
+) -> bool:
     try:
-        if downloader.save_path(dt).exists():
+        if not force_overwrite and downloader.save_path(dt).exists():
             logger.info(f"Skipping {dt}")
             return True
         return downloader.download1(dt)
@@ -65,9 +76,15 @@ if __name__ == "__main__":
         default="0",
         help="timezone offset in hours, example: +8 for Asia/Shanghai. Default UTC.",
     )
+    parser.add_argument(
+        "--force-overwrite",
+        action="store_true",
+        help="force overwrite existing files.",
+    )
     
     args = parser.parse_args()
     tz = timezone(timedelta(hours=int(args.timezone_offset_hours)))
     start = datetime.strptime(args.start, "%Y%m%d%H%M%S").replace(tzinfo=tz)
     end = datetime.strptime(args.end, "%Y%m%d%H%M%S").replace(tzinfo=tz)
-    run(start, end)
+    force_overwrite = args.force_overwrite
+    run(start, end, force_overwrite)
