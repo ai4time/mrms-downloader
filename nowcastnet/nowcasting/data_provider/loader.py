@@ -35,7 +35,7 @@ class InputHandle(Dataset):
         return case_list
 
     def datetime2path(self, temptime):
-        path = temptime.strftime("%Y/%m/%d/mrms/ncep/PrecipRate/PrecipRate_00.00_%Y%m%d-%H%M%S.png")
+        path = temptime.strftime("%Y/%m/%d/mrms/ncep/PrecipRate/PrecipRate_00.00_%Y%m%d-%H%M%S.uint16.png")
         path = self.data_path + '/' + path
         return path
 
