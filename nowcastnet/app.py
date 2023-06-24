@@ -1,19 +1,20 @@
-from flask import Flask, jsonify
+import argparse
+import json
 import os
 import shutil
-import argparse
-import cv2
-import numpy as np
+import time
+from datetime import datetime, timedelta
+
 import torch
-import json
+
+import nowcasting.evaluator as evaluator
 from nowcasting.data_provider import datasets_factory
 from nowcasting.models.model_factory import Model
-import nowcasting.evaluator as evaluator
-import time
-import sys
-from datetime import datetime, timedelta
+
+
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
+
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='NowcastNet')
 
