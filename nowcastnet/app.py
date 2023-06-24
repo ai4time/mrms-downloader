@@ -5,6 +5,7 @@ import shutil
 import time
 from datetime import datetime, timedelta
 
+import anylearn
 import torch
 
 import nowcasting.evaluator as evaluator
@@ -14,6 +15,16 @@ from nowcasting.models.model_factory import Model
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.benchmark = True
+
+
+if os.environ.get('ANYLEARN_TASK_ID', None) is not None:
+    pretrained_model_path = str(anylearn.get_model("chenky/mrms_nowcastnet").download())
+    dataset_path = str(anylearn.get_dataset("yhuang/MRMS").download())
+    output_path = str(anylearn.get_dataset("yhuang/MRMS-RT").download())
+else:
+    pretrained_model_path = ""
+    dataset_path = "./data"
+    output_path = "./data"
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description='NowcastNet')
@@ -30,11 +41,12 @@ parser.add_argument('--img_ch', type=int, default=2)
 parser.add_argument('--case_type', type=str, default='normal')
 parser.add_argument('--model_name', type=str, default='nowcasting')
 parser.add_argument('--gen_frm_dir', type=str, default='results/nowcasting')
-parser.add_argument('--pretrained_model', type=str, default='')
+parser.add_argument('--pretrained_model', type=str, default=pretrained_model_path)
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--num_save_samples', type=int, default=10)
 parser.add_argument('--ngf', type=int, default=32)
-parser.add_argument('--dataset_path', type=str)
+parser.add_argument('--dataset_path', type=str, default=dataset_path)
+parser.add_argument('--output_path', type=str, default=dataset_path)
 
 parser.add_argument('--present_time', type=str)
 
@@ -70,7 +82,7 @@ def next_time(present_time, delta_min = 2):
 def check_path(present_time):
     present_time = datetime.strptime(present_time, "%Y%m%d-%H%M%S")
     for i in range(args.input_length):
-        path = present_time.strftime("%Y/%m/%d/mrms/ncep/PrecipRate/PrecipRate_00.00_%Y%m%d-%H%M%S.png")
+        path = present_time.strftime("%Y/%m/%d/mrms/ncep/PrecipRate/PrecipRate_00.00_%Y%m%d-%H%M%S.uint16.png")
         path = args.dataset_path + '/' + path
         if not os.path.exists(path):
             return False
