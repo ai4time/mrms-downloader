@@ -81,10 +81,23 @@ if __name__ == "__main__":
         action="store_true",
         help="force overwrite existing files.",
     )
+    parser.add_argument(
+        "--debouncing-seconds",
+        type=int,
+        default=1,
+        help="debouncing seconds between downloads.",
+    )
     
     args = parser.parse_args()
     tz = timezone(timedelta(hours=int(args.timezone_offset_hours)))
     start = datetime.strptime(args.start, "%Y%m%d%H%M%S").replace(tzinfo=tz)
     end = datetime.strptime(args.end, "%Y%m%d%H%M%S").replace(tzinfo=tz)
     force_overwrite = args.force_overwrite
-    run(start, end, force_overwrite)
+    debouncing_seconds = args.debouncing_seconds
+
+    run(
+        start_dt=start,
+        end_dt=end,
+        force_overwrite=force_overwrite,
+        debouncing_seconds=debouncing_seconds,
+    )
