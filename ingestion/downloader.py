@@ -42,6 +42,9 @@ class MrmsDownloader(AbstractDownloader):
                 f"[{_status}] {e.response.reason}"
             )
             return False
+        except Exception as e:
+            logger.error(f"Failed to download {url}: {e}")
+            return False
 
     def url(self, dt: datetime) -> str:
         dt_str = datetime.strftime(dt, "%Y%m%d-%H%M%S")
