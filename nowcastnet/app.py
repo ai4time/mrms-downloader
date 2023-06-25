@@ -46,7 +46,7 @@ parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--num_save_samples', type=int, default=10)
 parser.add_argument('--ngf', type=int, default=32)
 parser.add_argument('--dataset_path', type=str, default=dataset_path)
-parser.add_argument('--output_path', type=str, default=dataset_path)
+parser.add_argument('--output_path', type=str, default=output_path)
 
 parser.add_argument('--present_time', type=str)
 
