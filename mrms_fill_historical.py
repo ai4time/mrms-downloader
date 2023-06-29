@@ -50,7 +50,7 @@ def download(
         if not force_overwrite and downloader.save_path(dt).exists():
             logger.info(f"Skipping {dt}")
             return True
-        return downloader.download1(dt)
+        return downloader.download1(dt, purge_gz=True)
     except Exception as e:
         logger.error(f"Failed to download {dt}: {e}")
         return False

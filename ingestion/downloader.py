@@ -1,4 +1,5 @@
 import abc
+import gzip
 import os
 import shutil
 import time
@@ -27,13 +28,14 @@ class MrmsDownloader(AbstractDownloader):
         super().__init__()
         self.base_dir = Path(base_dir)
 
-    def download1(self, dt: datetime) -> bool:
+    def download1(self, dt: datetime, purge_gz: bool = True) -> bool:
         url = self.url(dt)
         save_path = self.save_path(dt)
         try:
             self._download(url, save_path)
-            self._2png(save_path, 'uint16')
-            self._2png(save_path, 'int16')
+            grib2_path = self._extract(save_path, purge=purge_gz)
+            self._2png(grib2_path, 'uint16')
+            self._2png(grib2_path, 'int16')
             return True
         except HTTPError as e:
             _status = e.response.status_code
@@ -68,11 +70,22 @@ class MrmsDownloader(AbstractDownloader):
         res.raise_for_status()
         with open(save_path, 'wb') as f:
             f.write(res.content)
-        logger.info(f"Saved to {save_path}")
+        logger.info(f"Saved to {str(save_path)}")
+
+    def _extract(self, gz_path: os.PathLike, purge: bool = False) -> Path:
+        with gzip.open(gz_path, 'rb') as fin:
+            grib2_path = gz_path.with_suffix('')
+            with open(grib2_path, 'wb') as fout:
+                shutil.copyfileobj(fin, fout)
+        logger.info(f"Extracted to {str(grib2_path)}")
+        if purge:
+            gz_path.unlink()
+            logger.info(f"Removed original gzip file {str(gz_path)}")
+        return grib2_path
 
     def _2png(
         self,
-        grib2gz_path: os.PathLike,
+        grib2_path: os.PathLike,
         data_type: str = 'uint16',
     ) -> None:
         ALLOWED_DATA_TYPES = ['int16', 'uint16']
@@ -82,17 +95,8 @@ class MrmsDownloader(AbstractDownloader):
                 f"got {data_type}"
             )
 
-        import gzip
-
         import cv2
         import pygrib
-
-        # Unzip to get grib2
-        grib2gz_path = Path(grib2gz_path)
-        with gzip.open(grib2gz_path, 'rb') as fin:
-            grib2_path = grib2gz_path.with_suffix('')
-            with open(grib2_path, 'wb') as fout:
-                shutil.copyfileobj(fin, fout)
 
         data = pygrib.open(str(grib2_path))
         for var in data:

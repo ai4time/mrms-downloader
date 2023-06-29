@@ -17,7 +17,7 @@ def run():
     downloader = MrmsDownloader(base_dir=data_workspace)
     while True:
         bounds = timer.get_bouding_datetime()
-        if downloader.download1(bounds.last):
+        if downloader.download1(bounds.last, purge_gz=True):
             wait = timer.get_waiting_time(bounds)
             time.sleep(wait)
         else:
