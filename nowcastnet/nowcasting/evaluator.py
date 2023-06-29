@@ -82,14 +82,16 @@ def test_pytorch_loader(model, test_input_handle, configs, itr):
 
 def check_path(root_path, time, model_name):
     present_time = datetime.datetime.strptime(time, "%Y%m%d-%H%M%S")
+    year = str(present_time.year)
     date = present_time.strftime("%Y%m%d")
     minute = present_time.strftime("%H%M%S")
 
     model_path = '/'.join([root_path, model_name])
-    date_path = '/'.join([root_path, model_name, date])
-    minute_path = '/'.join([root_path, model_name, date, minute])
+    year_path = '/'.join([root_path, model_name, year])
+    date_path = '/'.join([root_path, model_name, year, date])
+    minute_path = '/'.join([root_path, model_name, year, date, minute])
 
-    paths = [root_path, model_path, date_path, minute_path]
+    paths = [root_path, model_path, year_path, date_path, minute_path]
     for path in paths:    
         if not os.path.exists(path):
             os.mkdir(path)
