@@ -34,8 +34,8 @@ def get_precipitation_of_lnglat_point(
             detail="Invalid longitude or latitude value.",
         )
 
-    # TODO: most recent year
-    most_recent_date_path = sorted(settings.RESULT_DATA_SUBDIR.iterdir())[-1]
+    most_recent_year_path = sorted(settings.RESULT_DATA_SUBDIR.iterdir())[-1]
+    most_recent_date_path = sorted(most_recent_year_path.iterdir())[-1]
     most_recent_time_path = sorted(most_recent_date_path.iterdir())[-1]
     start_datetime_str = f"{most_recent_time_path.parent.name}{most_recent_time_path.name}"
     logger.info(
