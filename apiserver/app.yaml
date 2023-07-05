@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nowcastnet-demo-apiserver
+  name: nowcastnet-demo-apiserver
+  namespace: yhu
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nowcastnet-demo-apiserver
+  template:
+    metadata:
+      labels:
+        app: nowcastnet-demo-apiserver
+    spec:
+      containers:
+      - image: 10.101.72.12:30005/anylearn/nowcastnet-demo-apiserver:devel
+        name: nowcastnet-demo-apiserver
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATA_WORKSPACE
+          value: "/data"
+        - name: RESULT_DATA_SUBDIR
+          value: ""
+        resources:
+          requests:
+            cpu: 4
+            memory: 16Gi
+          limits:
+            cpu: 4
+            memory: 16Gi
+        volumeMounts:
+        - name: cave-8e2c8b66ec074008
+          mountPath: /data
+          subPath: USERee16e08a11ebbbe9d2ff387e91ee/dataset/DSET32a570084f028f0d75e9d30e9f83/release/results/NowcastNet
+      volumes:
+      - name: cave-8e2c8b66ec074008
+        nfs:
+          server: 10.108.195.95
+          path: /
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nowcastnet-demo-apiserver
+  name: nowcastnet-demo-apiserver
+  namespace: yhu
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    app: nowcastnet-demo-apiserver
