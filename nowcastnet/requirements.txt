@@ -1,8 +1,0 @@
-anylearn>=0.17.0
-torch
-torchvision
-matplotlib
-numpy
-opencv-python
-einops
-scikit-image
