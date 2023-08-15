@@ -46,7 +46,7 @@ class Timer:
         now = self._now()
         now_ts = int(now.timestamp())
         next_ts = int(bounds.next.timestamp())
-        return next_ts - now_ts
+        return next_ts - now_ts if next_ts > now_ts else 0
 
     def _now(self) -> datetime:
         return datetime.now(self.tz) - self.delay
